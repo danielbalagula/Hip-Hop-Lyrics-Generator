@@ -6,6 +6,7 @@ import random
 
 debug = "--debug" in sys.argv
 no_exceptions = "--no_exceptions" in sys.argv
+no_markov = "--no_markov" in sys.argv
 
 if no_exceptions:
 	exceptions = []
@@ -20,7 +21,6 @@ all_song_lyrics = ""
 randomness = 0
 
 def pre_process():
-
 	global all_song_lyrics
 	artists_info = get_artists()
 	for artist_info in artists_info:
@@ -30,9 +30,10 @@ def pre_process():
 		for song in songs:
 			current_song = Song(song, artist.name)
 			artist.add_song(current_song)
-			current_song.lyrics = format_lyrics(str(get_lyrics(current_song.url, artist.name, current_song.title)).replace("\n"," EOL "))
+			lyrics = get_lyrics(current_song.url, artist.name, current_song.title)
+			current_song.lyrics = format_lyrics(lyrics.replace("\n"," EOL "))
 			all_song_lyrics = all_song_lyrics + current_song.lyrics
-		all_song_lyrics = all_song_lyrics + " ENDOFARTIST"
+		all_song_lyrics = all_song_lyrics + " ENDOFARTIST "
 			
 	all_song_tokens = nltk.pos_tag(nltk.word_tokenize(unicode(all_song_lyrics, 'utf-8')))
 
@@ -57,6 +58,7 @@ def pre_process():
 
 def process():
 	global debug
+	print "\nLyrics:\n"
 	for i in range(1,25):
 		line = get_random_line(i)
 		line_structure = line.original_line_tokens
@@ -74,9 +76,13 @@ def process():
 				else:
 					new_line[p] = word
 		for word in new_line:
-			new_line_string += " " + word
-		new_line_string = new_line_string.lower()
+			if word != ".":
+				new_line_string += " " + word
+			else:
+				new_line_string += word
+		new_line_string = new_line_string[1:2].upper() + new_line_string[2:].lower()
 		print new_line_string
+	print "\n"
 			
 def get_random_line(i):
 	artist = random.choice(artists)
@@ -96,7 +102,8 @@ def check_exceptions(position, token_type, line):
 		return ""
 
 def get_word(previous_word, token_type, num_syllables):
-	if possible_word_followups[previous_word]:
+	global no_markov
+	if possible_word_followups[previous_word] and not no_markov:
 		word_followups = possible_word_followups[previous_word]
 		pos_used = possible_words[token_type]
 		same_syllables = syllable_list[str(num_syllables)]

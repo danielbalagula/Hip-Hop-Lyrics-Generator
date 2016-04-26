@@ -13,7 +13,7 @@ def find_between(s, first, last):
 def get_artists():
 
 	#artist_input = raw_input("Please enter the name of an artist(s) to get the lyrics from (Seperate multiple by commas): ")
-	artist_input = "future, lil wayne, drake, kanye west"
+	artist_input = "taylor swift, rolling stones, coldplay, beatles, bob dylan, neil young"
 
 	artist_list = [x.strip() for x in artist_input.split(',')]
 
@@ -56,8 +56,8 @@ def get_lyrics(song_url, artist_name, song_name):
 		if artist_name.replace("-", " ") in find_artist or find_artist == "" or ("verse" in find_artist and ":" not in find_artist):
 			verse = verse.replace("<p class=\"verse\">", "")
 			verse = verse.replace("<br/>", ".")
-			verse = verse.replace("?", "")
-			verse = verse.replace("!", "")
+			#verse = verse.replace("?", "")
+			#verse = verse.replace("!", "")
 			verse = verse.replace("</p>", ".")
 			extras = find_between(verse, "(", ")" )
 			while (extras != ""):
