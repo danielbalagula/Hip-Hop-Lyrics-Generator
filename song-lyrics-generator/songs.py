@@ -10,7 +10,7 @@ possible_word_followups = defaultdict(list)
 
 syllable_list = defaultdict(list)
 
-def syl(word):
+def num_syllables(word):
 	if (word in d):
 		length = [len(list(y for y in x if y[-1].isdigit())) for x in d[word.lower()]]
 		return length
@@ -29,26 +29,26 @@ class Song:
 		self.lyrics = ""
 		self.length = 0
 		self.lines = []
-		self.tokens = []
 		self.artist = a
 		self.title = n
 		self.url = 'http://www.metrolyrics.com/' + self.title + '-lyrics-' + a + '.html'
 
 	def add_line(self, l, n):
 		self.lines.append(Line(l,n))
+		self.length += 1
 
 class Line:
 	def __init__(self, l, n):
 		self.line_number = n
-		self.original_line_tokens = l
+		self.contents = l
 		self.repetitions = {}
 		i=0
-		for index, token in enumerate(self.original_line_tokens):
-			if int(index) < len(self.original_line_tokens)-1:
-				next_token_pos = self.original_line_tokens[index+1][0]
+		for index, token in enumerate(self.contents):
+			if int(index) < len(self.contents)-1:
+				next_token_pos = self.contents[index+1][0]
 			else:
 				next_token_pos = " "
-			token_syl = str(syl(token[0]))
+			token_syl = str(num_syllables(token[0]))
 			
 			if (token[0] not in syllable_list[token_syl]):
 				syllable_list[token_syl].append(token[0])
@@ -61,7 +61,7 @@ class Line:
 			if bool(self.repetitions):
 				for key in self.repetitions:
 					occurences = self.repetitions[key].split(',')
-					if self.original_line_tokens[int(occurences[0])][0] == token[0]:
+					if self.contents[int(occurences[0])][0] == token[0]:
 						found = True
 						self.repetitions[key] = self.repetitions[key] + "," + str(i)
 						self.repetitions[str(i)] = str(i) + "," + key

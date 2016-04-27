@@ -1,6 +1,7 @@
 import requests
 import bs4
 import random
+import sys
 
 def find_between(s, first, last):
     try:
@@ -12,18 +13,14 @@ def find_between(s, first, last):
 
 def get_artists():
 
-	#artist_input = raw_input("Please enter the name of an artist(s) to get the lyrics from (Seperate multiple by commas): ")
-	artist_input = "taylor swift, rolling stones, coldplay, beatles, bob dylan, neil young"
+	artist_list = []
+	for i in range(1,len(sys.argv)):
+		if "--" not in sys.argv[i]:
+			artist_list.append(sys.argv[i])
+		else:
+			break
 
-	artist_list = [x.strip() for x in artist_input.split(',')]
-
-	artist_formatted_list = []
-
-	for artist in artist_list:
-		artist_formatted_list.append(artist.lstrip().replace(" ", "-").lower())
-	i=0
-
-	return artist_formatted_list
+	return artist_list
 
 def get_songs(artist_name):
 
@@ -56,8 +53,8 @@ def get_lyrics(song_url, artist_name, song_name):
 		if artist_name.replace("-", " ") in find_artist or find_artist == "" or ("verse" in find_artist and ":" not in find_artist):
 			verse = verse.replace("<p class=\"verse\">", "")
 			verse = verse.replace("<br/>", ".")
-			#verse = verse.replace("?", "")
-			#verse = verse.replace("!", "")
+			verse = verse.replace("?", "")
+			verse = verse.replace("!", "")
 			verse = verse.replace("</p>", ".")
 			extras = find_between(verse, "(", ")" )
 			while (extras != ""):

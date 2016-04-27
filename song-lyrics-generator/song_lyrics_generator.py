@@ -30,8 +30,7 @@ def pre_process():
 		for song in songs:
 			current_song = Song(song, artist.name)
 			artist.add_song(current_song)
-			lyrics = get_lyrics(current_song.url, artist.name, current_song.title)
-			current_song.lyrics = format_lyrics(lyrics.replace("\n"," EOL "))
+			current_song.lyrics = format_lyrics(get_lyrics(current_song.url, artist.name, current_song.title).replace("\n"," EOL "))
 			all_song_lyrics = all_song_lyrics + current_song.lyrics
 		all_song_lyrics = all_song_lyrics + " ENDOFARTIST "
 			
@@ -61,14 +60,14 @@ def process():
 	print "\nLyrics:\n"
 	for i in range(1,25):
 		line = get_random_line(i)
-		line_structure = line.original_line_tokens
+		line_structure = line.contents
 		new_line = ["" for x in range(len(line_structure))]
 		new_line_string = ""
 		for p in range(0,len(line_structure)):
 			if new_line[p] == "":
 				word = check_exceptions(p, line_structure[p][1], line_structure);
 				if word == "":
-					word = get_word(new_line[p-1], line_structure[p][1], syl(word));
+					word = get_word(new_line[p-1], line_structure[p][1], num_syllables(word));
 					repeated_positions = check_repetitions(p, line);
 					for position in repeated_positions:
 						if new_line[int(position)] == "":
@@ -76,18 +75,20 @@ def process():
 				else:
 					new_line[p] = word
 		for word in new_line:
-			if word != ".":
-				new_line_string += " " + word
+			if word == "I":
+				new_line_string += " I"
+			elif word != ".":
+				new_line_string += " " + word.lower()
 			else:
 				new_line_string += word
-		new_line_string = new_line_string[1:2].upper() + new_line_string[2:].lower()
+		new_line_string = new_line_string[1:2].upper() + new_line_string[2:]
 		print new_line_string
-	print "\n"
 			
 def get_random_line(i):
 	artist = random.choice(artists)
 	song = random.choice(artist.songs)
 	while len(song.lines) < i+1:
+		#print "stuick here"
 		song = random.choice(artist.songs)
 	line = song.lines[i]
 	return line
