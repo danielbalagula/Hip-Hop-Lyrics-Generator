@@ -2,7 +2,7 @@
 from songs import *
 from lyric_formatter import *
 from lyric_extractor import *
-import random
+from random import randint
 
 debug = "--debug" in sys.argv
 no_exceptions = "--no_exceptions" in sys.argv
@@ -19,6 +19,10 @@ all_song_lyrics = ""
 
 #randomness = float((10-int(raw_input("How jumbled would like your lyrics to be? (0-10): "))))/10
 randomness = 0
+
+def generate_lyrics():
+	pre_process()
+	process()
 
 def pre_process():
 	global all_song_lyrics
@@ -77,6 +81,8 @@ def process():
 		for word in new_line:
 			if word == "I":
 				new_line_string += " I"
+			elif "'" in word and len(word) < 4:
+				new_line_string += word
 			elif word != ".":
 				new_line_string += " " + word.lower()
 			else:
@@ -88,7 +94,6 @@ def get_random_line(i):
 	artist = random.choice(artists)
 	song = random.choice(artist.songs)
 	while len(song.lines) < i+1:
-		#print "stuick here"
 		song = random.choice(artist.songs)
 	line = song.lines[i]
 	return line
@@ -111,11 +116,11 @@ def get_word(previous_word, token_type, num_syllables):
 		word_i_pos = list(set(word_followups) & set(pos_used))
 		word_i_pos_i_syl = list(set(word_i_pos) & set(same_syllables))
 		if word_i_pos_i_syl:
-			return random.choice(word_i_pos_i_syl)
+			return get_by_frequency(previous_word,word_i_pos_i_syl)
 		elif word_i_pos:
-			return random.choice(word_i_pos)
+			return get_by_frequency(previous_word,word_i_pos)
 		else:
-			return random.choice(word_followups)
+			return get_by_frequency(previous_word,word_followups)
 	else:
 		return random.choice(possible_words[token_type])
 
@@ -123,5 +128,15 @@ def check_repetitions(position, structure):
 	repeated_positions = structure.repetitions[str(position)].split(",")
 	return repeated_positions
 
-pre_process()
-process()
+def get_by_frequency(p_word,word_set):
+	total = 0
+	for word in word_set:
+		total+=followup_frequency[p_word+"->"+word]
+	num = randint(0,total)
+	counter = 0
+	for word in word_set:
+		counter += followup_frequency[p_word+"->"+word]
+		if counter >= num:
+			return word
+
+generate_lyrics()

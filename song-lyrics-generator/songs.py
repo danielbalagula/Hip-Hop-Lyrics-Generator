@@ -5,10 +5,9 @@ from collections import defaultdict
 d = cmudict.dict()
 
 possible_words = defaultdict(list)
-
 possible_word_followups = defaultdict(list)
-
 syllable_list = defaultdict(list)
+followup_frequency = {}
 
 def num_syllables(word):
 	if (word in d):
@@ -16,7 +15,6 @@ def num_syllables(word):
 		return length
 
 class Artist:
-	
 	def __init__(self, n):
 		self.name = n
 		self.songs = []
@@ -56,6 +54,9 @@ class Line:
 				possible_words[token[1]].append(token[0])
 			if next_token_pos not in possible_word_followups[token[0]]:
 				possible_word_followups[token[0]].append(next_token_pos)
+				followup_frequency[token[0]+"->"+next_token_pos] = 1
+			elif not next_token_pos == " ":
+				followup_frequency[token[0]+"->"+next_token_pos] += 1
 			
 			found = False
 			if bool(self.repetitions):
