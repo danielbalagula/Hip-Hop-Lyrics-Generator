@@ -26,7 +26,7 @@ def get_songs(artist_name):
 
 	intro = random.choice(["Adding a dash of ", "Sprinkling some of ", "Glazing some of ", "Sweetening with a touch of "])
 	url = 'http://www.metrolyrics.com/' + artist_name + '-lyrics.html'
-	print intro + artist_name + "'s most popular lyrics into the mix..."
+	print (intro + artist_name + "'s most popular lyrics into the mix...")
 	
 	artist_page = requests.get(url)
 	soup = bs4.BeautifulSoup(artist_page.content, "lxml")

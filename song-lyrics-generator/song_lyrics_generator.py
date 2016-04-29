@@ -16,6 +16,9 @@ else:
 artists = []
 all_song_tokens = []
 all_song_lyrics = ""
+text_song_lyrics = ""
+
+file = open("lyrics.txt", "w")
 
 #randomness = float((10-int(raw_input("How jumbled would like your lyrics to be? (0-10): "))))/10
 randomness = 0
@@ -26,6 +29,7 @@ def generate_lyrics():
 
 def pre_process():
 	global all_song_lyrics
+	global text_song_lyrics
 	artists_info = get_artists()
 	for artist_info in artists_info:
 		artists.append(Artist(artist_info))
@@ -34,11 +38,12 @@ def pre_process():
 		for song in songs:
 			current_song = Song(song, artist.name)
 			artist.add_song(current_song)
-			current_song.lyrics = format_lyrics(get_lyrics(current_song.url, artist.name, current_song.title).replace("\n"," EOL "))
-			all_song_lyrics = all_song_lyrics + current_song.lyrics
+			current_song.lyrics = get_lyrics(current_song.url, artist.name, current_song.title)
+			text_song_lyrics = text_song_lyrics + current_song.lyrics
+			all_song_lyrics = all_song_lyrics +  format_lyrics(get_lyrics(current_song.url, artist.name, current_song.title).replace("\n"," EOL "))
 		all_song_lyrics = all_song_lyrics + " ENDOFARTIST "
-			
-	all_song_tokens = nltk.pos_tag(nltk.word_tokenize(unicode(all_song_lyrics, 'utf-8')))
+	file.write(text_song_lyrics)		
+	all_song_tokens = nltk.pos_tag(nltk.word_tokenize(all_song_lyrics))
 
 	i=1
 	for artist in artists:
@@ -61,7 +66,7 @@ def pre_process():
 
 def process():
 	global debug
-	print "\nLyrics:\n"
+	print ("\nLyrics:\n")
 	for i in range(1,25):
 		line = get_random_line(i)
 		line_structure = line.contents
@@ -88,7 +93,7 @@ def process():
 			else:
 				new_line_string += word
 		new_line_string = new_line_string[1:2].upper() + new_line_string[2:]
-		print new_line_string
+		print (new_line_string)
 			
 def get_random_line(i):
 	artist = random.choice(artists)
